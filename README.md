@@ -100,9 +100,9 @@ PS> .\enable_psremoting.ps1 .\hosts.csv
 
 ### Install winlogbeat agent via PowerShell
 
-This repository contains a PowerShell scripts that run through the above instillation process for either a single host or a CSV file of hosts.
+This repository contains a PowerShell scripts that run through the above installation process for either a single host or a CSV file of hosts.
 
-#### Many Hosts Instillation
+#### Many Hosts Installation
 
 **Make sure `winlogbeat.yml` and `winlogbeat-8.2.2-windows-x86_64.msi` must be in `C:\` directory.**
 

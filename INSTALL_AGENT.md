@@ -43,12 +43,53 @@ PS> Start-Service winlogbeat
 
 ### Enable WinRM
 
-To install the winlogbeat agents across the network without internet access, we used powershell scripting to move the installer and configuration file across the network. To do this, we needed to enable `WinRM` to use remote powershell sessions. This can be done in a few different ways:
+To install the winlogbeat agents across the network without internet access, we used powershell scripting to move the installer and configuration file across the network. To do this, we needed to enable `WinRM` to use remote powershell sessions. This can be done in a few different ways (sourced from ([https://adamtheautomator.com/enable-psremoting/):
 
-1. With a PowerShell CimSession from a Domain Admin
-* See enable_remoting script
+#### 1. Locally with PowerShell
 
-2. With Group Policy (better option if targeting entire network)
+To enable WinRM on a local computer, simply execute the following command in PowerShell:
+```powershell
+PS> Enable-PSRemoting -Force
+```
+
+#### 2. With a PowerShell CimSession from a Domain Admin
+
+You can use the CimSession tool to spawn a powershell instance on a remote system, and use that powershell instance to run `Enable-PSRemoting`. The script looks like this:
+
+```powershell
+$SessionArgs = @{
+        ComputerName = <HOSTNAME or IP>
+        Credential = Get-Credential
+        SessionOption = New-CimSessionOption -Protocol Dcom
+    }
+
+    $MethodArgs = @{
+        ClassName = 'Win32_Process'
+        MethodName = 'Create'
+        CimSession = New-CimSession @SessionArgs
+        Arguments = @{
+            CommandLine = "powershell Start-Process [pwershell -ArgumentList 'Enable-PSRemoting -Force'"
+        }
+    }
+
+    Invoke-CimMethod @MethodArgs
+```
+
+* The [enable_psremoting_network.ps1](enable_psremoting_network.ps1) script runs this command for a list of hosts in a CSV file. Make sure the first line of the CSV file defines the column with hostnames as `TargetHost`:
+
+```csv
+TargetHost,XYZ,XYZ,...
+hostname01,XYZ,XYZ,...
+hostname01,XYZ,XYZ,...
+...
+```
+
+* Run the [enable_psremoting_network.ps1](enable_psremoting_network.ps1) script like this:
+```powershell
+PS> .\enable_psremoting.ps1 .\hosts.csv
+```
+
+#### 3. With Group Policy (better option if targeting entire network)
 
 * Many tutorials out there, we used: https://www.youtube.com/watch?v=zVMGal0MpSA
 * Once configured, you can push the group policy out to all computers on the network from the Domain Controller (or any machine with GPMC)
@@ -57,6 +98,12 @@ To install the winlogbeat agents across the network without internet access, we 
 
 ### Install winlogbeat agent via PowerShell
 
-This repository contains a couple of different scripts for installing agents on a windows host remotely following the above steps in powershell.
+This repository contains a PowerShell scripts that run through the above instillation process for either a single host or a CSV file of hosts.
 
-* `remote_log`
+#### Many Hosts Instillation
+
+**Make sure `winlogbeat.yml` and `winlogbeat-8.2.2-windows-x86_64.msi` must be in `C:\` directory.**
+
+```powershell
+PS> .\install_winlogbeat_network.ps1 .\hosts.csv
+```

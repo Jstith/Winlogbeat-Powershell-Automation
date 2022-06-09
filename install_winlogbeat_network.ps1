@@ -24,57 +24,27 @@ $args[0] = CSV file with host names under "TargetHost" name (credentials can be 
 
 Example:
 
-.\FrankensteinsMonster .\workstations.csv
+.\install_winlogbeat_network .\workstations.csv
 
 IMPORTANT! Run with the following files in C:\ directory:
 C:\winlogbeat-8.2.2-windows-x86_64.msi
 C:\winlogbeat.yml
 
 See documentation at https://github.com/Jstith/Winlogbeat-Powershell-Automation for more information
-
 #>
 
 $fileName = $args[0]
 
-# Credentials for CimSession Powershell connections. Tested with domain administrator creds.
-$cred = Get-Credential
-
-# Iterates through each entry in CSV file (after header)
-Import-Csv $filename | ForEach-Object {
-    
-    
-    $TargetHost = "$($_.TargetHost)"
-
-    $SessionArgs = @{
-        ComputerName = $TargetHost
-        Credential = $cred
-        SessionOption = New-CimSessionOption -Protocol Dcom
-    }
-
-    $MethodArgs = @{
-        ClassName = 'Win32_Process'
-        MethodName = 'Create'
-        CimSession = New-CimSession @SessionArgs
-        Arguments = @{
-            CommandLine = "powershell Start-Process [pwershell -ArgumentList 'Enable-PSRemoting -Force'"
-        }
-    }
-
-    # Uses CimMethod powershell to enable PS-Remote sessions (must be run in elevated context)
-    Invoke-CimMethod @MethodArgs
-}
-
-# Hard coded delay, optional if you have strong network bandwidth
-Start-Sleep -Seconds 5
-
-# Iterates through csv file again, this time to install
+# Iterates through csv file to get host targets
 Import-Csv $fileName | ForEach-Object {
     
     # Creates PS Session with target host
     $session = New-PSSession -ComputerName $($_.TargetHost)
 
     # Checks if a winlogbeat.yml file is already in the service's directory (indicating service is already installed)
-    if((Invoke-Command -Session $session -ScriptBlock { Test-Path -Path "C:\winlogbeat.yml" -PathType Leaf }) -eq ("*","True","*")) {
+    $result = $null
+    $result = Invoke-Command -Session $session -ScriptBlock { Test-Path -Path "C:\ProgramData\Elastic\Beats\winlogbeat\winlogbeat.yml" -PathType Leaf }
+    if($result -eq "True") {
         Write-Output "Configuration file already in place for $($_.TargetHost), skipping..."
     }
     else {

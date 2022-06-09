@@ -107,3 +107,20 @@ This repository contains a PowerShell scripts that run through the above instill
 ```powershell
 PS> .\install_winlogbeat_network.ps1 .\hosts.csv
 ```
+
+## Debugging Bad Sessions
+
+If a windows endpoint is not sending logs to Security Onion, ensure that all of the following are true:
+
+* Ensure `sysmon` service is running and windows logs are being collected in event viewer
+    * In event viewer: `Application and Services Logs > Microsoft > Windows > Sysmon`
+* Ensure `winlogbeat` service is running (Listed as `Elastic Winlogbeat 8.2.2` in `services.msc`)
+* Ensure `C:\ProgramData\Elastic\winlogbeat\winlogbeat.yml` is properly configured with the above steps and in the correct directory
+
+### Network Debugging
+
+To see if WinRM is properly enabled and the winlogbeat service is running on a list of hosts, use the [check_status_network.ps1](check_status_network.ps1) script with a list of hosts.
+
+```powershell
+PS> .\check_status_network.ps1 .\hosts.csv
+```

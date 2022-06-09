@@ -118,8 +118,8 @@ setup.kibana:
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  username: "user"
-  password: "pass"
+  #username: "user"
+  #password: "pass"
 
   # Pipeline to route events to security, sysmon, or powershell pipelines.
   pipeline: "winlogbeat-%{[agent.version]}-routing"

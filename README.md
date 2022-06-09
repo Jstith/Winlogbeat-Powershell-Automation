@@ -102,13 +102,17 @@ PS> .\enable_psremoting.ps1 .\hosts.csv
 
 This repository contains a PowerShell scripts that run through the above installation process for either a single host or a CSV file of hosts.
 
-#### Many Hosts Installation
+#### 1. Via PowerShell
 
 **Make sure `winlogbeat.yml` and `winlogbeat-8.2.2-windows-x86_64.msi` must be in `C:\` directory.**
 
 ```powershell
 PS> .\install_winlogbeat_network.ps1 .\hosts.csv
 ```
+
+#### 2. Via Group Policy
+
+I have not had success doing this yet, but ideally this can be configred through group policy as well. See this article for details: https://mikebosland.com/installing-and-configuring-active-directory-with-powershell/
 
 ## Debugging Bad Sessions
 

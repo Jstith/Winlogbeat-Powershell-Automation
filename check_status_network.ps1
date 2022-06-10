@@ -11,7 +11,7 @@ $ErrorActionPreference = 'silentlycontinue'
 
 Import-Csv $args[0] | ForEach-Object {
     $result = $null
-    $result = Test-WSMan -ComputerName = $($_.TargetHost)
+    $result = Test-WSMan -ComputerName $($_.TargetHost)
     if($result -eq $null) {
         Write-Host "$($_.TargetHost) WinRM Failure"
     }

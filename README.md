@@ -6,6 +6,8 @@
 
 Our Security Onion is configured to read network and host logs into the ELK (elasticsearch, logstash, kibana) software stack on the Security Onion box. `Winlogbeat` is a windows log aggregation service built by elastic to send windows logs to the ELK stack in Security Onion.
 
+![Winlogbeat Diagram](static/outline.png)
+
 We have `Winlogbeat` agents installed on each windows 10 machine on the network. There is a service configured to run on startup called `winlogbeat`. The data for the service is stored in `C:\ProgramData\Elastic\Beats\winlogbeat\`.
 
 ## Installing the agents

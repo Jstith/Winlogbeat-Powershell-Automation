@@ -27,6 +27,7 @@ Comment out the following lines in the Elasticsearch Output section:
 Uncomment the following lines:
 *     output.logstash
 *     hosts ["127.0.0.1:5044"]
+
 ### 3. Change the target IP of Logstash to Security Onion Box
 
 Change the Logstash hosts line in the Logstash Output section:
@@ -43,6 +44,27 @@ In powershell, run the following command:
 ```powershell
 PS> Start-Service winlogbeat
 ```
+
+### 6. Configured Security Onion
+
+Finally, your Security Onion Firewall must be configured to allow access from the windows machines with winlogbeat running. On your security onion console, set the following firewall configuration:
+
+```
+$ sudo so-allow
+```
+
+You will get a list of rules to modify, select `b` for Logstash endpoint
+
+```
+$ b
+```
+
+When prompted, add the range of IP addresses you wish to allow
+
+```
+$ 172.20.0.0/16
+```
+
 ## Network Distribution
 
 ### Enable WinRM
